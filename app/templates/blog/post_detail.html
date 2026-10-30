@@ -1,35 +1,38 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container">
-    <div class="post-detail-container">
+<div class="container py-4">
+    <div class="article-reading-container post-detail-container">
         <!-- Post Header -->
-        <header class="post-header">
-            <!-- Category and Date -->
-            <div class="d-flex align-items-center justify-content-between mb-3">
-                <a href="{{ url_for('main.index', category=post.category.slug) }}" 
-                   class="badge bg-primary text-white text-decoration-none px-3 py-2 rounded-pill">
-                    {{ post.category.name }}
-                </a>
+        <header class="article-header post-header">
+            <!-- Category, Reading Time, and Date Meta -->
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                <div class="d-flex align-items-center gap-2">
+                    <a href="{{ url_for('main.index', category=post.category.slug) }}" 
+                       class="badge-category text-decoration-none">
+                        <i class="bi bi-tag-fill me-1"></i>{{ post.category.name }}
+                    </a>
+                    <span class="badge-read-time">
+                        <i class="bi bi-clock me-1"></i>{{ post.reading_time }} min read
+                    </span>
+                </div>
                 <span class="text-secondary small">
-                    <i class="bi bi-calendar3 me-1"></i> Published on {{ post.created_at.strftime('%B %d, %Y') }}
+                    <i class="bi bi-calendar3 me-1"></i> {{ post.created_at.strftime('%B %d, %Y') }}
                 </span>
             </div>
 
-            <!-- Complete Title -->
-            <h1 class="post-title">{{ post.title }}</h1>
+            <!-- Complete Article Title -->
+            <h1 class="article-headline post-title">{{ post.title }}</h1>
 
-            <!-- Author & Metadata -->
-            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 pt-2">
-                <div class="d-flex align-items-center gap-2">
-                    <a href="{{ url_for('auth.user_profile', username=post.author.username) }}" class="author-badge">
-                        <span class="avatar-circle fs-6">{{ post.author.username[:1].upper() }}</span>
-                        <div>
-                            <div class="fw-bold text-dark">{{ post.author.username }}</div>
-                            <div class="text-secondary small">Author</div>
-                        </div>
-                    </a>
-                </div>
+            <!-- Author & Action Controls -->
+            <div class="article-author-bar pt-2">
+                <a href="{{ url_for('auth.user_profile', username=post.author.username) }}" class="author-badge text-decoration-none">
+                    <span class="avatar-circle fs-6">{{ post.author.username[:1].upper() }}</span>
+                    <div>
+                        <div class="fw-bold text-dark">{{ post.author.username }}</div>
+                        <div class="text-secondary small">Author &bull; {{ post.author.posts.count() }} published {% if post.author.posts.count() == 1 %}post{% else %}posts{% endif %}</div>
+                    </div>
+                </a>
 
                 <!-- Post Owner Actions: Edit and Delete Buttons -->
                 {% if current_user.is_authenticated and current_user.id == post.user_id %}
@@ -51,19 +54,23 @@
         </header>
 
         <!-- Full Post Content (Sanitized HTML & Markdown) -->
-        <article class="post-content">
+        <article class="article-content post-content">
             {{ post.html_content }}
         </article>
 
-        <!-- Post Footer / Navigation Back -->
-        <div class="d-flex justify-content-between align-items-center py-4 border-top border-bottom mb-5">
+        <!-- Article Action / Share Bar -->
+        <div class="article-action-bar">
             <a href="{{ url_for('main.index') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
-                <i class="bi bi-arrow-left me-1"></i> Back to All Articles
+                <i class="bi bi-arrow-left me-1"></i> Back to Articles
             </a>
-            <div class="d-flex align-items-center gap-2 text-secondary small">
-                <span>Share:</span>
+            
+            <div class="d-flex align-items-center gap-2">
+                <span class="text-secondary small me-1">Share:</span>
+                <button type="button" id="btn-copy-link" class="btn btn-sm btn-outline-secondary rounded-pill px-3" data-url="{{ request.url }}">
+                    <i class="bi bi-link-45deg me-1"></i> Copy Link
+                </button>
                 <a href="https://twitter.com/intent/tweet?text={{ post.title|urlencode }}&url={{ request.url|urlencode }}" 
-                   target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-light border rounded-circle text-primary" title="Share on Twitter">
+                   target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-light border rounded-circle text-primary" title="Share on Twitter / X">
                     <i class="bi bi-twitter-x"></i>
                 </a>
                 <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.url|urlencode }}" 
@@ -73,8 +80,72 @@
             </div>
         </div>
 
+        <!-- About The Author Card -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-5 bg-white">
+            <div class="d-flex align-items-center gap-3">
+                <span class="avatar-circle" style="width: 56px; height: 56px; font-size: 1.4rem;">
+                    {{ post.author.username[:1].upper() }}
+                </span>
+                <div class="flex-grow-1">
+                    <div class="d-flex align-items-center justify-content-between flex-wrap">
+                        <h5 class="fw-bold text-dark mb-0">Written by {{ post.author.username }}</h5>
+                        <a href="{{ url_for('auth.user_profile', username=post.author.username) }}" class="btn btn-sm btn-outline-primary rounded-pill px-3 mt-1 mt-md-0">
+                            View Profile
+                        </a>
+                    </div>
+                    <p class="text-secondary small mb-0 mt-1">
+                        Member of the Blogify creator community since {{ post.author.created_at.strftime('%B %Y') }}. Has published {{ post.author.posts.count() }} articles.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- RELATED ARTICLES -->
+        {% if related_posts %}
+            <div class="related-articles-section mb-5">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h4 class="fw-bold text-dark mb-0">
+                        <i class="bi bi-stars text-primary me-2"></i>Related Articles
+                    </h4>
+                    <a href="{{ url_for('main.index', category=post.category.slug) }}" class="text-primary small text-decoration-none fw-semibold">
+                        More in {{ post.category.name }} &rarr;
+                    </a>
+                </div>
+                <div class="row g-3">
+                    {% for rpost in related_posts %}
+                        <div class="col-md-4">
+                            <div class="card blog-card h-100 border-0 shadow-sm">
+                                <div class="blog-card-cover cover-gradient-{{ (rpost.id % 6) + 1 }}">
+                                    <span class="badge-category">{{ rpost.category.name }}</span>
+                                    <span class="badge-read-time">
+                                        <i class="bi bi-clock me-1"></i>{{ rpost.reading_time }}m
+                                    </span>
+                                </div>
+                                <div class="card-body p-3 d-flex flex-column">
+                                    <h6 class="fw-bold text-dark mb-2 line-clamp-2">
+                                        <a href="{{ url_for('blog.post_detail', post_id=rpost.id) }}" class="text-decoration-none text-dark">
+                                            {{ rpost.title }}
+                                        </a>
+                                    </h6>
+                                    <p class="text-secondary small line-clamp-2 mb-3 flex-grow-1">
+                                        {{ rpost.excerpt }}
+                                    </p>
+                                    <div class="d-flex align-items-center justify-content-between pt-2 border-top small text-secondary">
+                                        <span>{{ rpost.author.username }}</span>
+                                        <a href="{{ url_for('blog.post_detail', post_id=rpost.id) }}" class="text-primary text-decoration-none fw-semibold">
+                                            Read &rarr;
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
         <!-- COMMENTS SECTION -->
-        <section id="comments-section" class="comments-section">
+        <section id="comments-section" class="comments-section comments-container">
             <div class="d-flex align-items-center justify-content-between mb-4">
                 <h3 class="fw-bold text-dark mb-0">
                     <i class="bi bi-chat-left-text text-primary me-2"></i>Comments 
@@ -83,10 +154,15 @@
             </div>
 
             <!-- Comment Input Box -->
-            <div class="card border-1 shadow-sm mb-4">
+            <div class="card border-0 shadow-sm mb-4 rounded-4">
                 <div class="card-body p-4">
                     {% if current_user.is_authenticated %}
-                        <h5 class="fw-bold text-dark mb-3">Leave a Comment</h5>
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <span class="avatar-circle" style="width: 32px; height: 32px; font-size: 0.85rem;">
+                                {{ current_user.username[:1].upper() }}
+                            </span>
+                            <span class="fw-bold text-dark">Leave a comment as {{ current_user.username }}</span>
+                        </div>
                         <form method="POST" action="{{ url_for('blog.post_detail', post_id=post.id) }}">
                             {{ comment_form.hidden_tag() }}
                             <div class="mb-3">
@@ -128,8 +204,8 @@
                     {% for c in comments %}
                         <div class="comment-card" id="comment-{{ c.id }}">
                             <div class="d-flex justify-content-between align-items-start mb-2">
-                                <div class="comment-author-info">
-                                    <span class="avatar-circle" style="width: 28px; height: 28px; font-size: 0.8rem;">
+                                <div class="comment-author-info d-flex align-items-center gap-2">
+                                    <span class="avatar-circle" style="width: 32px; height: 32px; font-size: 0.85rem;">
                                         {{ c.author.username[:1].upper() }}
                                     </span>
                                     <div>
@@ -169,16 +245,17 @@
                             </div>
 
                             <!-- Comment Content -->
-                            <div class="comment-content">
+                            <div class="comment-content text-dark">
                                 {{ c.content }}
                             </div>
                         </div>
                     {% endfor %}
                 </div>
             {% else %}
-                <div class="text-center py-4 bg-white border rounded-3 p-4">
+                <div class="text-center py-4 bg-white border rounded-4 p-4 shadow-sm">
+                    <i class="bi bi-chat-dots fs-3 text-secondary mb-2 d-block"></i>
                     <p class="text-secondary mb-0">
-                        <i class="bi bi-chat-dots me-1"></i> No comments yet. Be the first to share your thoughts!
+                        No comments yet. Be the first to share your thoughts on this story!
                     </p>
                 </div>
             {% endif %}
@@ -186,4 +263,3 @@
     </div>
 </div>
 {% endblock %}
-

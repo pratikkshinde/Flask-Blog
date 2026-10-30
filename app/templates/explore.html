@@ -1,54 +1,76 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container py-2">
+<div class="container py-4">
     <!-- Header -->
     <div class="mb-5 text-center">
+        <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1 mb-2 fw-semibold">
+            <i class="bi bi-compass me-1"></i> Topic Directory
+        </span>
         <h1 class="display-6 fw-bold text-dark mb-2">Explore Topics & Categories</h1>
         <p class="text-secondary mx-auto" style="max-width: 600px;">
-            Dive into specialized topics across programming, modern web technologies, AI, careers, and engineering.
+            Dive into curated subjects across software engineering, web architectures, AI innovations, career growth, and industry best practices.
         </p>
     </div>
 
     <!-- Stats Bar -->
     <div class="row g-3 mb-5">
         <div class="col-md-4">
-            <div class="stats-card">
-                <div class="stats-number">{{ total_posts }}</div>
-                <div class="stats-label">Published Articles</div>
+            <div class="stat-tile">
+                <div class="stat-tile-icon icon-blue">
+                    <i class="bi bi-file-earmark-text"></i>
+                </div>
+                <div>
+                    <div class="stat-tile-val">{{ total_posts }}</div>
+                    <div class="stat-tile-label">Published Articles</div>
+                </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="stats-card">
-                <div class="stats-number">{{ categories|length }}</div>
-                <div class="stats-label">Curated Topics</div>
+            <div class="stat-tile">
+                <div class="stat-tile-icon icon-cyan">
+                    <i class="bi bi-tags"></i>
+                </div>
+                <div>
+                    <div class="stat-tile-val">{{ categories|length }}</div>
+                    <div class="stat-tile-label">Curated Topics</div>
+                </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="stats-card">
-                <div class="stats-number">{{ total_authors }}</div>
-                <div class="stats-label">Registered Creators</div>
+            <div class="stat-tile">
+                <div class="stat-tile-icon icon-violet">
+                    <i class="bi bi-people"></i>
+                </div>
+                <div>
+                    <div class="stat-tile-val">{{ total_authors }}</div>
+                    <div class="stat-tile-label">Registered Creators</div>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Categories Grid -->
-    <h3 class="fw-bold text-dark mb-4"><i class="bi bi-grid-fill text-primary me-2"></i>Browse by Topic</h3>
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <h3 class="fw-bold text-dark mb-0"><i class="bi bi-grid-fill text-primary me-2"></i>Browse by Topic</h3>
+        <span class="text-secondary small">{{ categories|length }} available categories</span>
+    </div>
+
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
         {% for cat in categories %}
             <div class="col">
-                <div class="card h-100 border-1 shadow-sm rounded-3">
+                <div class="card h-100 border-0 shadow-sm rounded-4">
                     <div class="card-body p-4 d-flex flex-column">
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <h5 class="fw-bold mb-0 text-dark">{{ cat.name }}</h5>
-                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-1">
-                                {{ cat.posts.count() }} posts
+                            <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1 fw-semibold">
+                                {{ cat.posts.count() }} {{ 'article' if cat.posts.count() == 1 else 'articles' }}
                             </span>
                         </div>
                         <p class="text-secondary small mb-4 flex-grow-1">
                             {{ cat.description or "Read the latest essays, thoughts, and technical posts in " ~ cat.name ~ "." }}
                         </p>
-                        <a href="{{ url_for('main.index', category=cat.slug) }}" class="btn btn-outline-primary btn-sm rounded-pill mt-auto fw-semibold">
+                        <a href="{{ url_for('main.index', category=cat.slug) }}" class="btn btn-outline-primary btn-sm rounded-pill mt-auto fw-semibold py-2">
                             Explore {{ cat.name }} <i class="bi bi-arrow-right ms-1"></i>
                         </a>
                     </div>
@@ -59,26 +81,40 @@
 
     <!-- Recent Stories -->
     {% if recent_posts %}
-        <div class="mt-5 pt-3 border-top">
+        <div class="mt-5 pt-4 border-top">
             <div class="d-flex align-items-center justify-content-between mb-4">
                 <h3 class="fw-bold text-dark mb-0"><i class="bi bi-lightning-charge-fill text-warning me-2"></i>Recently Added</h3>
-                <a href="{{ url_for('main.index') }}" class="text-decoration-none fw-semibold">View All Articles &rarr;</a>
+                <a href="{{ url_for('main.index') }}" class="text-primary text-decoration-none fw-semibold">View All Articles &rarr;</a>
             </div>
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
                 {% for post in recent_posts %}
                     <div class="col">
-                        <article class="blog-card">
-                            <div class="card-body">
-                                <div class="mb-2">
-                                    <span class="badge bg-light text-primary border">{{ post.category.name }}</span>
-                                </div>
-                                <h4 class="blog-card-title">
-                                    <a href="{{ url_for('blog.post_detail', post_id=post.id) }}">{{ post.title }}</a>
-                                </h4>
-                                <p class="blog-card-preview">{{ post.summary(120) }}</p>
-                                <div class="blog-card-meta">
-                                    <span class="fw-semibold text-dark small">{{ post.author.username }}</span>
-                                    <span class="text-muted small">{{ post.created_at.strftime('%b %d, %Y') }}</span>
+                        <article class="card blog-card h-100 border-0 shadow-sm">
+                            <div class="blog-card-cover cover-gradient-{{ (post.id % 6) + 1 }}">
+                                <span class="badge-category">{{ post.category.name }}</span>
+                                <span class="badge-read-time">
+                                    <i class="bi bi-clock me-1"></i>{{ post.reading_time }} min read
+                                </span>
+                            </div>
+                            <div class="card-body p-4 d-flex flex-column">
+                                <h5 class="fw-bold text-dark mb-2 line-clamp-2">
+                                    <a href="{{ url_for('blog.post_detail', post_id=post.id) }}" class="text-decoration-none text-dark">
+                                        {{ post.title }}
+                                    </a>
+                                </h5>
+                                <p class="text-secondary small line-clamp-3 mb-4 flex-grow-1">
+                                    {{ post.summary(140) }}
+                                </p>
+                                <div class="d-flex align-items-center justify-content-between pt-3 border-top mt-auto">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="avatar-circle" style="width: 28px; height: 28px; font-size: 0.75rem;">
+                                            {{ post.author.username[:1].upper() }}
+                                        </span>
+                                        <span class="fw-semibold text-dark small">{{ post.author.username }}</span>
+                                    </div>
+                                    <a href="{{ url_for('blog.post_detail', post_id=post.id) }}" class="read-article-link small">
+                                        Read <i class="bi bi-arrow-right"></i>
+                                    </a>
                                 </div>
                             </div>
                         </article>
@@ -89,4 +125,3 @@
     {% endif %}
 </div>
 {% endblock %}
-

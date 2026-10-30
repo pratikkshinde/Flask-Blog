@@ -33,6 +33,11 @@ class User(UserMixin, db.Model):
     def post_count(self) -> int:
         return self.posts.count()
 
+    @property
+    def total_words(self) -> int:
+        """Total words published across all user posts."""
+        return sum(p.word_count for p in self.posts)
+
     def __repr__(self):
         return f'<User {self.username}>'
 
@@ -102,6 +107,16 @@ class Post(db.Model):
     @property
     def comment_count(self) -> int:
         return self.comments.count()
+
+    @property
+    def word_count(self) -> int:
+        """Count words in content."""
+        return len(self.content.split()) if self.content else 0
+
+    @property
+    def reading_time(self) -> int:
+        """Calculate estimated reading time in minutes (200 words/min)."""
+        return max(1, round(self.word_count / 200))
 
     def __repr__(self):
         return f'<Post {self.title}>'

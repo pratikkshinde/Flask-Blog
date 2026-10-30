@@ -56,12 +56,20 @@ def post_detail(post_id):
 
     comments = post.comments.order_by(Comment.created_at.asc()).all()
 
+    # Query related articles (same category or recent)
+    related_posts = Post.query.filter(Post.id != post.id, Post.category_id == post.category_id).order_by(Post.created_at.desc()).limit(3).all()
+    if len(related_posts) < 3:
+        existing_ids = [p.id for p in related_posts] + [post.id]
+        additional = Post.query.filter(~Post.id.in_(existing_ids)).order_by(Post.created_at.desc()).limit(3 - len(related_posts)).all()
+        related_posts.extend(additional)
+
     return render_template(
         'blog/post_detail.html',
         title=post.title,
         post=post,
         comments=comments,
-        comment_form=comment_form
+        comment_form=comment_form,
+        related_posts=related_posts
     )
 
 

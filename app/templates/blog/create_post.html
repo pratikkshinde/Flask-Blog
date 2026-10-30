@@ -1,17 +1,20 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container py-2">
+<div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-lg-9">
-            <div class="card border-1 shadow-sm rounded-3">
+            <div class="card border-0 shadow-sm rounded-4">
                 <div class="card-body p-4 p-md-5">
-                    <div class="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom">
+                    <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom">
                         <div>
-                            <h2 class="fw-bold text-dark mb-1">Create New Blog Post</h2>
-                            <p class="text-secondary small mb-0">Share your thoughts, tutorials, or industry insights.</p>
+                            <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1 mb-2 fw-semibold">
+                                <i class="bi bi-pencil-square me-1"></i> Story Editor
+                            </span>
+                            <h2 class="fw-bold text-dark mb-1">Create New Article</h2>
+                            <p class="text-secondary small mb-0">Share your tutorials, stories, or development insights with the Blogify community.</p>
                         </div>
-                        <a href="{{ url_for('auth.dashboard') }}" class="btn btn-outline-secondary btn-sm rounded-pill">
+                        <a href="{{ url_for('auth.dashboard') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
                             <i class="bi bi-x-lg me-1"></i> Cancel
                         </a>
                     </div>
@@ -19,10 +22,10 @@
                     <form method="POST" action="{{ url_for('blog.create_post') }}">
                         {{ form.hidden_tag() }}
 
-                        <!-- Post Title -->
-                        <div class="mb-3">
+                        <!-- Article Title -->
+                        <div class="mb-4">
                             {{ form.title.label(class="form-label fw-semibold text-dark") }}
-                            {{ form.title(class="form-control form-control-lg" ~ (" is-invalid" if form.title.errors else ""), 
+                            {{ form.title(class="form-control form-control-lg rounded-3 fs-5" ~ (" is-invalid" if form.title.errors else ""), 
                                           placeholder="Enter an engaging, descriptive title...") }}
                             {% for error in form.title.errors %}
                                 <div class="invalid-feedback">{{ error }}</div>
@@ -32,25 +35,25 @@
                         <!-- Category Selection -->
                         <div class="mb-4">
                             {{ form.category_id.label(class="form-label fw-semibold text-dark") }}
-                            {{ form.category_id(class="form-select" ~ (" is-invalid" if form.category_id.errors else "")) }}
+                            {{ form.category_id(class="form-select rounded-3 py-2" ~ (" is-invalid" if form.category_id.errors else "")) }}
                             {% for error in form.category_id.errors %}
                                 <div class="invalid-feedback">{{ error }}</div>
                             {% endfor %}
                         </div>
 
-                        <!-- Content Editor with Rich Text Toolbar & Live Preview -->
+                        <!-- Content Editor with Rich Text Toolbar, Live Word Count & Preview -->
                         <div class="mb-4">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <label class="form-label fw-semibold text-dark mb-0">Post Content</label>
+                                <label class="form-label fw-semibold text-dark mb-0">Article Content</label>
                                 <!-- Write / Preview Nav Tabs -->
-                                <ul class="nav nav-pills nav-fill small">
+                                <ul class="nav nav-pills nav-fill small gap-1">
                                     <li class="nav-item">
-                                        <button type="button" class="nav-link py-1 px-3 active fw-semibold" id="write-tab-btn">
+                                        <button type="button" class="nav-link py-1 px-3 active rounded-pill fw-semibold" id="write-tab-btn">
                                             <i class="bi bi-pen me-1"></i> Write
                                         </button>
                                     </li>
                                     <li class="nav-item">
-                                        <button type="button" class="nav-link py-1 px-3 fw-semibold" id="preview-tab-btn">
+                                        <button type="button" class="nav-link py-1 px-3 rounded-pill fw-semibold" id="preview-tab-btn">
                                             <i class="bi bi-eye me-1"></i> Live Preview
                                         </button>
                                     </li>
@@ -71,13 +74,19 @@
                                 </div>
                                 {{ form.content(class="form-control editor-textarea" ~ (" is-invalid" if form.content.errors else ""), 
                                                 id="post-content-editor", 
-                                                rows="14", 
+                                                rows="15", 
                                                 placeholder="Write your story using Markdown syntax or use the toolbar above...") }}
+                                <!-- Metrics Counter Bar -->
+                                <div class="editor-meta-bar">
+                                    <span id="editor-word-count"><i class="bi bi-file-text me-1"></i>0 words</span>
+                                    <span id="editor-read-time"><i class="bi bi-clock me-1"></i>~1 min read</span>
+                                    <span id="editor-char-count">0 characters</span>
+                                </div>
                             </div>
 
                             <!-- Live Preview Container (Hidden by default) -->
-                            <div id="editor-preview-container" class="card card-body p-4 border bg-white rounded-bottom d-none" 
-                                 style="min-height: 380px;">
+                            <div id="editor-preview-container" class="card card-body p-4 border bg-white rounded-bottom d-none article-content" 
+                                 style="min-height: 420px;">
                                 <!-- Live rendered output will be populated by main.js -->
                             </div>
 
@@ -90,7 +99,7 @@
                         </div>
 
                         <!-- Submit Buttons -->
-                        <div class="d-flex justify-content-end gap-2 pt-2 border-top">
+                        <div class="d-flex justify-content-end gap-2 pt-3 border-top">
                             <a href="{{ url_for('auth.dashboard') }}" class="btn btn-outline-secondary px-4 rounded-pill">
                                 Cancel
                             </a>
@@ -103,4 +112,3 @@
     </div>
 </div>
 {% endblock %}
-

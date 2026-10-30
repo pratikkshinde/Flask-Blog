@@ -1,111 +1,140 @@
-// Main JavaScript for FlaskBlog Platform
+// Blogify Professional UI/UX JavaScript
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Confirm Delete Actions
+    // 1. Delete Confirmation Handlers
+    initDeleteConfirmations();
+
+    // 2. Post Editor Tools (Markdown Toolbar, Live Preview, Word Count & Reading Time)
+    initPostEditor();
+
+    // 3. Share Buttons & Copy Link Functionality
+    initShareButtons();
+
+    // 4. Auto-dismiss Flash Alerts
+    initAlertDismiss();
+});
+
+/**
+ * Attaches confirmation prompts to delete forms.
+ */
+function initDeleteConfirmations() {
     document.querySelectorAll('.form-delete-confirm').forEach(form => {
         form.addEventListener('submit', (e) => {
             const itemType = form.getAttribute('data-item-type') || 'item';
-            const confirmed = window.confirm(`Are you sure you want to delete this ${itemType}? This action cannot be undone.`);
+            const confirmed = window.confirm(`Are you sure you want to permanently delete this ${itemType}? This action cannot be undone.`);
             if (!confirmed) {
                 e.preventDefault();
             }
         });
     });
-
-    // 2. Markdown Editor Toolbar Functionality
-    const editorTextarea = document.getElementById('post-content-editor');
-    if (editorTextarea) {
-        setupMarkdownToolbar(editorTextarea);
-    }
-
-    // 3. Auto-close flash alerts after 6 seconds
-    const alerts = document.querySelectorAll('.alert-dismissible');
-    alerts.forEach(alert => {
-        setTimeout(() => {
-            try {
-                const bsAlert = new bootstrap.Alert(alert);
-                bsAlert.close();
-            } catch (err) {
-                alert.style.display = 'none';
-            }
-        }, 6000);
-    });
-});
+}
 
 /**
- * Attaches toolbar action handlers to wrap or insert markdown tokens.
+ * Post Editor Enhancements: Toolbar, Live Word Count, Reading Time, and Preview.
  */
-function setupMarkdownToolbar(textarea) {
+function initPostEditor() {
+    const editor = document.getElementById('post-content-editor');
+    if (!editor) return;
+
+    const wordCountEl = document.getElementById('editor-word-count');
+    const readTimeEl = document.getElementById('editor-read-time');
+    const charCountEl = document.getElementById('editor-char-count');
+
+    function updateMetrics() {
+        const text = editor.value.trim();
+        const words = text ? text.split(/\s+/).filter(Boolean).length : 0;
+        const chars = text.length;
+        const readingTime = Math.max(1, Math.round(words / 200));
+
+        if (wordCountEl) wordCountEl.textContent = `${words} words`;
+        if (charCountEl) charCountEl.textContent = `${chars} characters`;
+        if (readTimeEl) readTimeEl.textContent = `~${readingTime} min read`;
+    }
+
+    editor.addEventListener('input', updateMetrics);
+    updateMetrics(); // Initial calculation
+
+    // Formatting Toolbar Actions
     const toolbar = document.querySelector('.editor-toolbar');
-    if (!toolbar) return;
+    if (toolbar) {
+        toolbar.addEventListener('click', (e) => {
+            const btn = e.target.closest('button[data-format]');
+            if (!btn) return;
+            e.preventDefault();
+            const format = btn.getAttribute('data-format');
+            applyFormatting(editor, format);
+            updateMetrics();
+        });
+    }
 
-    toolbar.addEventListener('click', (e) => {
-        const btn = e.target.closest('button[data-format]');
-        if (!btn) return;
-        e.preventDefault();
-
-        const format = btn.getAttribute('data-format');
-        applyFormatting(textarea, format);
-    });
-
-    // Live preview toggle if preview tab exists
-    const previewTab = document.getElementById('preview-tab-btn');
+    // Write / Preview Tabs
     const writeTab = document.getElementById('write-tab-btn');
-    const previewArea = document.getElementById('editor-preview-container');
-    const editorContainer = document.getElementById('editor-write-container');
+    const previewTab = document.getElementById('preview-tab-btn');
+    const writeContainer = document.getElementById('editor-write-container');
+    const previewContainer = document.getElementById('editor-preview-container');
 
-    if (previewTab && writeTab && previewArea && editorContainer) {
+    if (writeTab && previewTab && writeContainer && previewContainer) {
         previewTab.addEventListener('click', () => {
             previewTab.classList.add('active');
             writeTab.classList.remove('active');
-            editorContainer.classList.add('d-none');
-            previewArea.classList.remove('d-none');
-
-            // Simple client-side Markdown rendering preview
-            previewArea.innerHTML = simpleMarkdownParse(textarea.value);
+            writeContainer.classList.add('d-none');
+            previewContainer.classList.remove('d-none');
+            previewContainer.innerHTML = renderMarkdownClient(editor.value);
         });
 
         writeTab.addEventListener('click', () => {
             writeTab.classList.add('active');
             previewTab.classList.remove('active');
-            previewArea.classList.add('d-none');
-            editorContainer.classList.remove('d-none');
-            textarea.focus();
+            previewContainer.classList.add('d-none');
+            writeContainer.classList.remove('d-none');
+            editor.focus();
         });
     }
 }
 
+/**
+ * Inserts markdown formatting syntax at the cursor or around selected text.
+ */
 function applyFormatting(textarea, format) {
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
-    const selectedText = textarea.value.substring(start, end);
+    const selected = textarea.value.substring(start, end);
     let replacement = '';
 
     switch (format) {
         case 'bold':
-            replacement = `**${selectedText || 'bold text'}**`;
+            replacement = `**${selected || 'bold text'}**`;
             break;
         case 'italic':
-            replacement = `*${selectedText || 'italic text'}*`;
+            replacement = `*${selected || 'italic text'}*`;
             break;
         case 'heading':
-            replacement = `\n## ${selectedText || 'Heading 2'}\n`;
+            replacement = `\n## ${selected || 'Heading 2'}\n`;
+            break;
+        case 'subheading':
+            replacement = `\n### ${selected || 'Subheading'}\n`;
             break;
         case 'quote':
-            replacement = `\n> ${selectedText || 'Quote'}\n`;
+            replacement = `\n> ${selected || 'Quote'}\n`;
             break;
         case 'code':
-            if (selectedText.includes('\n')) {
-                replacement = `\n\`\`\`python\n${selectedText || '# code here'}\n\`\`\`\n`;
+            if (selected.includes('\n')) {
+                replacement = `\n\`\`\`python\n${selected || '# Write code here'}\n\`\`\`\n`;
             } else {
-                replacement = `\`${selectedText || 'code'}\``;
+                replacement = `\`${selected || 'code'}\``;
             }
             break;
         case 'list':
-            replacement = `\n- ${selectedText || 'List item'}\n`;
+            replacement = `\n- ${selected || 'List item'}\n`;
+            break;
+        case 'numlist':
+            replacement = `\n1. ${selected || 'Numbered item'}\n`;
             break;
         case 'link':
-            replacement = `[${selectedText || 'link text'}](https://example.com)`;
+            replacement = `[${selected || 'link text'}](https://example.com)`;
+            break;
+        case 'hr':
+            replacement = `\n---\n`;
             break;
         default:
             return;
@@ -116,11 +145,11 @@ function applyFormatting(textarea, format) {
 }
 
 /**
- * Basic client-side markdown preview renderer for instant feedback.
+ * Client-side lightweight markdown parser for instant editor preview.
  */
-function simpleMarkdownParse(md) {
+function renderMarkdownClient(md) {
     if (!md || !md.trim()) {
-        return '<p class="text-muted fst-italic">Nothing to preview yet. Start typing your blog post!</p>';
+        return '<p class="text-muted fst-italic py-4 text-center">Nothing to preview yet. Start typing your story in the editor!</p>';
     }
 
     let html = md
@@ -128,14 +157,16 @@ function simpleMarkdownParse(md) {
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;');
 
-    // Code blocks
+    // Fenced Code blocks
     html = html.replace(/```([a-z]*)\n([\s\S]*?)```/gm, '<pre><code>$2</code></pre>');
     // Inline code
     html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-    // Headers
-    html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
-    html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
-    html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+    // Horizontal Rule
+    html = html.replace(/^---$/gm, '<hr>');
+    // Headings
+    html = html.replace(/^### (.*$)/gim, '<h3 class="fw-bold mt-4 mb-2">$1</h3>');
+    html = html.replace(/^## (.*$)/gim, '<h2 class="fw-bold mt-4 mb-3">$1</h2>');
+    html = html.replace(/^# (.*$)/gim, '<h1 class="fw-bold mt-4 mb-3">$1</h1>');
     // Bold & Italic
     html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
     html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
@@ -143,12 +174,55 @@ function simpleMarkdownParse(md) {
     html = html.replace(/^\> (.*$)/gim, '<blockquote>$1</blockquote>');
     // Links
     html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+    // Unordered lists
+    html = html.replace(/^\- (.*$)/gim, '<li>$1</li>');
+    html = html.replace(/(<li>.*<\/li>)/gms, '<ul>$1</ul>');
     // Paragraphs
     html = html.replace(/\n\n+/g, '</p><p>');
     html = '<p>' + html + '</p>';
-    // Line breaks
+    // Clean remaining single newlines
     html = html.replace(/\n/g, '<br>');
 
     return html;
 }
 
+/**
+ * Copy to clipboard and share button actions.
+ */
+function initShareButtons() {
+    const copyBtn = document.getElementById('btn-copy-link');
+    if (copyBtn) {
+        copyBtn.addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText(window.location.href);
+                const originalHtml = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i class="bi bi-check2 me-1"></i> Copied!';
+                copyBtn.classList.remove('btn-outline-secondary');
+                copyBtn.classList.add('btn-success');
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalHtml;
+                    copyBtn.classList.remove('btn-success');
+                    copyBtn.classList.add('btn-outline-secondary');
+                }, 2500);
+            } catch (err) {
+                prompt('Copy this link:', window.location.href);
+            }
+        });
+    }
+}
+
+/**
+ * Automatically dismisses flash alert banners.
+ */
+function initAlertDismiss() {
+    document.querySelectorAll('.alert-dismissible').forEach(alert => {
+        setTimeout(() => {
+            try {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            } catch (err) {
+                alert.style.display = 'none';
+            }
+        }, 5000);
+    });
+}
