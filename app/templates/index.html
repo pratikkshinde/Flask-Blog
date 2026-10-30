@@ -7,12 +7,13 @@
     <div class="hero-section">
         <div class="row align-items-center">
             <div class="col-lg-8">
-                <span class="badge bg-white text-primary mb-3 px-3 py-2 fw-semibold rounded-pill shadow-sm">
-                    <i class="bi bi-stars me-1"></i> Welcome to FlaskBlog
-                </span>
-                <h1 class="display-5 fw-bold mb-3">Publish Ideas, Expand Knowledge, Connect Readers.</h1>
+                <div class="d-inline-flex align-items-center gap-2 bg-white text-primary mb-3 px-3 py-2 fw-semibold rounded-pill shadow-sm">
+                    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Blogify" class="brand-logo-img" style="width: 20px; height: 20px; box-shadow: none;">
+                    <span>Welcome to Blogify</span>
+                </div>
+                <h1 class="display-5 fw-bold mb-2">Write. Share. Inspire.</h1>
                 <p class="hero-subtitle mb-4">
-                    Explore thoughtful essays, technical deep dives, tutorials, and discussions written by passionate creators.
+                    Discover thoughtful essays, technical deep dives, tutorials, and discussions published by passionate creators on Blogify.
                 </p>
                 <div class="d-flex flex-wrap gap-2">
                     {% if current_user.is_authenticated %}
@@ -24,7 +25,7 @@
                         </a>
                     {% else %}
                         <a href="{{ url_for('auth.register') }}" class="btn btn-light text-primary fw-bold px-4 py-2 rounded-pill shadow-sm">
-                            <i class="bi bi-person-plus me-1"></i> Join FlaskBlog Free
+                            <i class="bi bi-person-plus me-1"></i> Join Blogify Free
                         </a>
                         <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light px-4 py-2 rounded-pill">
                             <i class="bi bi-box-arrow-in-right me-1"></i> Sign In

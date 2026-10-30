@@ -6,12 +6,14 @@
         <div class="col-md-6 col-lg-5">
             <div class="card border-1 shadow-sm rounded-3">
                 <div class="card-body p-4 p-md-5">
+                    <!-- Brand Logo & Header -->
                     <div class="text-center mb-4">
-                        <div class="avatar-circle mx-auto mb-3" style="width: 50px; height: 50px; font-size: 1.5rem;">
-                            <i class="bi bi-box-arrow-in-right"></i>
-                        </div>
-                        <h2 class="fw-bold text-dark">Welcome Back</h2>
-                        <p class="text-secondary small">Sign in to your FlaskBlog account to continue</p>
+                        <a href="{{ url_for('main.index') }}" class="d-inline-block mb-2 text-decoration-none">
+                            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Blogify Logo" class="brand-logo-img brand-logo-lg mx-auto">
+                        </a>
+                        <h2 class="fw-bold text-dark mb-1">Welcome Back</h2>
+                        <p class="text-primary small fw-semibold mb-1">Write. Share. Inspire.</p>
+                        <p class="text-secondary small mb-0">Sign in to your Blogify account to continue</p>
                     </div>
 
                     <form method="POST" action="{{ url_for('auth.login', next=request.args.get('next')) }}">
@@ -67,4 +69,3 @@
     </div>
 </div>
 {% endblock %}
-

@@ -4,9 +4,12 @@
 <div class="container py-2">
     <!-- Welcome Header & Stats -->
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 pb-3 border-bottom">
-        <div>
-            <h1 class="h2 fw-bold text-dark mb-1">Welcome back, {{ user.username }}!</h1>
-            <p class="text-secondary mb-0">Manage your published blog posts, check analytics, and draft new content.</p>
+        <div class="d-flex align-items-center gap-3">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Blogify Logo" class="brand-logo-img" style="width: 52px; height: 52px;">
+            <div>
+                <h1 class="h2 fw-bold text-dark mb-1">Welcome back, {{ user.username }}!</h1>
+                <p class="text-secondary mb-0">Manage your published blog posts, check analytics, and draft new content on Blogify.</p>
+            </div>
         </div>
         <div>
             <a href="{{ url_for('blog.create_post') }}" class="btn btn-primary px-4 py-2 rounded-pill fw-semibold shadow-sm">
@@ -110,7 +113,7 @@
                     </div>
                     <h4 class="fw-bold text-dark mb-2">No Blog Posts Yet</h4>
                     <p class="text-secondary small mb-4" style="max-width: 460px; margin: 0 auto;">
-                        You haven't written any articles yet. Share your stories, coding tutorials, or industry insights with the FlaskBlog community!
+                        You haven't written any articles yet. Share your stories, coding tutorials, or industry insights with the Blogify community!
                     </p>
                     <a href="{{ url_for('blog.create_post') }}" class="btn btn-primary px-4 py-2 rounded-pill fw-semibold">
                         <i class="bi bi-pencil-square me-1"></i> Create Your First Post

@@ -1,5 +1,5 @@
 """
-Database Seeding Script for FlaskBlog.
+Database Seeding Script for Blogify.
 Populates initial categories, demo users, sample blog posts, and comments.
 Run with: python seed.py
 """

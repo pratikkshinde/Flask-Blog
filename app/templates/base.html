@@ -3,8 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% if title %}{{ title }} | {% endif %}FlaskBlog - Modern Publishing Platform</title>
+    <title>{% if title %}{{ title }} | {% endif %}Blogify — Write. Share. Inspire.</title>
     
+    <!-- Favicon Assets -->
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='img/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ url_for('static', filename='img/favicon-192x192.png') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/favicon-192x192.png') }}">
+
     <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,9 +30,10 @@
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('main.index') }}">
-                <i class="bi bi-feather text-primary"></i>
-                <span>FlaskBlog</span>
+            <!-- Brand Logo & Name -->
+            <a class="navbar-brand" href="{{ url_for('main.index') }}" title="Blogify - Write. Share. Inspire.">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Blogify Logo" class="brand-logo-img">
+                <span class="brand-name">Blogify<span class="brand-dot">.</span></span>
             </a>
             
             <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,7 +42,7 @@
             
             <div class="collapse navbar-collapse" id="navbarContent">
                 <!-- Left Nav Links -->
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-2">
                     <li class="nav-item">
                         <a class="nav-link {% if request.endpoint == 'main.index' %}active{% endif %}" href="{{ url_for('main.index') }}">
                             <i class="bi bi-house-door me-1"></i>Home
@@ -52,7 +59,7 @@
                 <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
                     {% if current_user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="btn btn-sm btn-primary px-3 rounded-pill me-lg-2 my-1 my-lg-0" href="{{ url_for('blog.create_post') }}">
+                            <a class="btn btn-sm btn-primary px-3 rounded-pill me-lg-2 my-1 my-lg-0 shadow-sm" href="{{ url_for('blog.create_post') }}">
                                 <i class="bi bi-pencil-square me-1"></i>Create Post
                             </a>
                         </li>
@@ -64,7 +71,7 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <span class="avatar-circle">{{ current_user.username[:1].upper() }}</span>
-                                <span>{{ current_user.username }}</span>
+                                <span class="fw-semibold text-dark">{{ current_user.username }}</span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="userMenu">
                                 <li>
@@ -136,9 +143,10 @@
             <div class="row gy-4">
                 <div class="col-md-5">
                     <div class="d-flex align-items-center gap-2 mb-2">
-                        <i class="bi bi-feather text-primary fs-4"></i>
-                        <h5 class="mb-0 fw-bold text-dark">FlaskBlog</h5>
+                        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Blogify Logo" class="brand-logo-img" style="width: 32px; height: 32px;">
+                        <span class="brand-name fs-5">Blogify<span class="brand-dot">.</span></span>
                     </div>
+                    <p class="text-primary small fw-semibold mb-2">Write. Share. Inspire.</p>
                     <p class="text-secondary small mb-0">
                         A modern, production-grade blogging platform powered by Flask, SQLAlchemy, Jinja2, and responsive modern styling.
                     </p>
@@ -170,7 +178,7 @@
             </div>
             <hr class="my-4 border-secondary opacity-25">
             <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center small text-secondary">
-                <p class="mb-0">&copy; 2026 FlaskBlog. All rights reserved.</p>
+                <p class="mb-0">&copy; 2026 Blogify. All rights reserved.</p>
                 <p class="mb-0">Built with Flask &bull; SQLite/PostgreSQL Ready</p>
             </div>
         </div>
@@ -183,4 +191,3 @@
     {% block extra_js %}{% endblock %}
 </body>
 </html>
-

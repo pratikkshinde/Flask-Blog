@@ -1,12 +1,14 @@
-# Blogging Platform with Flask (Phase 2 Complete)
+# Blogify — Modern Publishing Platform (Phase 2 Complete)
 
-A modern, production-grade blogging platform developed using Python, Flask, SQLAlchemy, Flask-Login, Flask-Migrate, and Bootstrap 5.
+> **Write. Share. Inspire.**
+
+A modern, production-grade blogging platform developed using Python, Flask, SQLAlchemy, Flask-Login, Flask-Migrate, and Bootstrap 5 with custom brand identity.
 
 ---
 
 ## 1. Project Overview
 
-**FlaskBlog** is a full-featured content publishing and community discussion platform. Building upon Phase 1's core foundation (authentication and post CRUD), Phase 2 introduces:
+**Blogify** is a full-featured content publishing and community discussion platform. Building upon Phase 1's core foundation (authentication and post CRUD), Phase 2 introduces:
 
 - Enhanced responsive user interfaces for desktops, tablets, and mobile devices.
 - Multi-criteria real-time search (by title, content, and author).
