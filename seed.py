@@ -140,3 +140,4 @@ def calculate_reading_time(word_count: int, wpm: int = 200) -> int:
 
 if __name__ == '__main__':
     seed_database()
+

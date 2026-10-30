@@ -103,3 +103,4 @@ def user_profile(username):
         posts=posts,
         total_posts=total_posts
     )
+

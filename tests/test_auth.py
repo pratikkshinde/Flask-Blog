@@ -72,3 +72,4 @@ def test_protected_routes_require_login(client):
         response = client.get(url, follow_redirects=False)
         assert response.status_code == 302
         assert '/auth/login' in response.headers['Location']
+

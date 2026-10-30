@@ -142,3 +142,4 @@ def test_prevent_unauthorized_comment_delete(client, auth, test_users, test_post
 
     with app.app_context():
         assert db.session.get(Comment, comment_id) is not None
+

@@ -121,3 +121,4 @@ class Comment(db.Model):
 
     def __repr__(self):
         return f'<Comment {self.id} on Post {self.post_id}>'
+

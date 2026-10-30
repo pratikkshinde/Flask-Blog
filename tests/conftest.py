@@ -89,3 +89,4 @@ def test_post(app, test_users):
         db.session.add(post)
         db.session.commit()
         return post.id
+

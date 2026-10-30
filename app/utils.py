@@ -69,3 +69,4 @@ def get_plain_summary(text: str, length: int = 160) -> str:
     if len(cleaned) <= length:
         return cleaned
     return cleaned[:length].rstrip() + '...'
+

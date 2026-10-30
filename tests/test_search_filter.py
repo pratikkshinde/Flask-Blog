@@ -137,3 +137,4 @@ def test_no_results_found(client, app):
     response = client.get('/?q=UnmatchedKeywordXYZ123')
     assert response.status_code == 200
     assert b'No Matching Blog Posts Found' in response.data
+

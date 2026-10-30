@@ -123,3 +123,4 @@ def test_user_dashboard_only_shows_own_posts(client, auth, test_users, test_post
     assert response.status_code == 200
     assert b"Alice&#39;s First Post" in response.data or b"Alice's First Post" in response.data
     assert b"Bob&#39;s Private Post" not in response.data and b"Bob's Private Post" not in response.data
+

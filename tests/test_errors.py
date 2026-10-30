@@ -5,3 +5,4 @@ def test_404_error_page(client):
     assert b'404' in response.data
     assert b'Page Not Found' in response.data
     assert b'Return Home' in response.data
+

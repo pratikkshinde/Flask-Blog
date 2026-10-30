@@ -74,3 +74,4 @@ class SearchForm(FlaskForm):
     q = StringField('Search posts...', validators=[Length(max=100)])
     category = SelectField('Category', choices=[('', 'All Categories')], default='')
     sort = SelectField('Sort By', choices=[('newest', 'Newest First'), ('oldest', 'Oldest First')], default='newest')
+

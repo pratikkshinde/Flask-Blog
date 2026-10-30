@@ -25,3 +25,4 @@ if __name__ == '__main__':
             app.logger.warning(f"Could not seed default categories: {e}")
 
     app.run(host='127.0.0.1', port=5000, debug=True)
+
