@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card border-1 shadow-sm rounded-3">
+                <div class="card-body p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <div class="avatar-circle mx-auto mb-3" style="width: 50px; height: 50px; font-size: 1.5rem;">
+                            <i class="bi bi-person-plus"></i>
+                        </div>
+                        <h2 class="fw-bold text-dark">Create Account</h2>
+                        <p class="text-secondary small">Join our community of passionate writers and thinkers</p>
+                    </div>
+
+                    <form method="POST" action="{{ url_for('auth.register') }}">
+                        {{ form.hidden_tag() }}
+
+                        <!-- Username -->
+                        <div class="mb-3">
+                            {{ form.username.label(class="form-label fw-semibold text-dark") }}
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0 text-muted">
+                                    <i class="bi bi-person"></i>
+                                </span>
+                                {{ form.username(class="form-control border-start-0" ~ (" is-invalid" if form.username.errors else ""), 
+                                                 placeholder="Choose a unique username") }}
+                                {% for error in form.username.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="mb-3">
+                            {{ form.email.label(class="form-label fw-semibold text-dark") }}
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0 text-muted">
+                                    <i class="bi bi-envelope"></i>
+                                </span>
+                                {{ form.email(class="form-control border-start-0" ~ (" is-invalid" if form.email.errors else ""), 
+                                              placeholder="name@example.com") }}
+                                {% for error in form.email.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="mb-3">
+                            {{ form.password.label(class="form-label fw-semibold text-dark") }}
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0 text-muted">
+                                    <i class="bi bi-lock"></i>
+                                </span>
+                                {{ form.password(class="form-control border-start-0" ~ (" is-invalid" if form.password.errors else ""), 
+                                                 placeholder="At least 6 characters") }}
+                                {% for error in form.password.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Confirm Password -->
+                        <div class="mb-4">
+                            {{ form.confirm_password.label(class="form-label fw-semibold text-dark") }}
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0 text-muted">
+                                    <i class="bi bi-shield-check"></i>
+                                </span>
+                                {{ form.confirm_password(class="form-control border-start-0" ~ (" is-invalid" if form.confirm_password.errors else ""), 
+                                                         placeholder="Re-enter password") }}
+                                {% for error in form.confirm_password.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="d-grid mb-3">
+                            {{ form.submit(class="btn btn-primary py-2 fw-semibold rounded-pill") }}
+                        </div>
+
+                        <p class="text-center text-secondary small mb-0">
+                            Already have an account? 
+                            <a href="{{ url_for('auth.login') }}" class="text-primary fw-semibold text-decoration-none">
+                                Sign in
+                            </a>
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

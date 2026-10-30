@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-2">
+    <!-- Welcome Header & Stats -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 pb-3 border-bottom">
+        <div>
+            <h1 class="h2 fw-bold text-dark mb-1">Welcome back, {{ user.username }}!</h1>
+            <p class="text-secondary mb-0">Manage your published blog posts, check analytics, and draft new content.</p>
+        </div>
+        <div>
+            <a href="{{ url_for('blog.create_post') }}" class="btn btn-primary px-4 py-2 rounded-pill fw-semibold shadow-sm">
+                <i class="bi bi-plus-circle me-1"></i> Create New Post
+            </a>
+        </div>
+    </div>
+
+    <!-- Summary Statistics Bar -->
+    <div class="row g-3 mb-5">
+        <div class="col-sm-6 col-md-4">
+            <div class="stats-card">
+                <div class="stats-number">{{ total_posts }}</div>
+                <div class="stats-label">Total Posts Created</div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-4">
+            <div class="stats-card">
+                <div class="stats-number">{{ user.comments.count() }}</div>
+                <div class="stats-label">Total Comments Written</div>
+            </div>
+        </div>
+        <div class="col-sm-12 col-md-4">
+            <div class="stats-card">
+                <div class="stats-number" style="font-size: 1.5rem; margin-top: 0.5rem; margin-bottom: 0.5rem;">
+                    {{ user.created_at.strftime('%B %Y') }}
+                </div>
+                <div class="stats-label">Member Since</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Posts Section -->
+    <div class="card border-1 shadow-sm rounded-3">
+        <div class="card-header bg-white py-3 px-4 d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold text-dark mb-0"><i class="bi bi-file-earmark-text text-primary me-2"></i>My Blog Posts</h5>
+            <span class="badge bg-light text-secondary border px-3 py-2">{{ total_posts }} {{ 'post' if total_posts == 1 else 'posts' }}</span>
+        </div>
+
+        <div class="card-body p-0">
+            {% if posts %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col" class="ps-4">Post Title</th>
+                                <th scope="col">Category</th>
+                                <th scope="col">Creation Date</th>
+                                <th scope="col" class="text-center">Comments</th>
+                                <th scope="col" class="text-end pe-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for post in posts %}
+                                <tr>
+                                    <td class="ps-4 py-3">
+                                        <a href="{{ url_for('blog.post_detail', post_id=post.id) }}" class="fw-bold text-dark text-decoration-none">
+                                            {{ post.title }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-primary border">
+                                            {{ post.category.name }}
+                                        </span>
+                                    </td>
+                                    <td class="text-secondary small">
+                                        {{ post.created_at.strftime('%b %d, %Y') }}
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-secondary-subtle text-secondary rounded-pill">
+                                            <i class="bi bi-chat-dots me-1"></i>{{ post.comment_count }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <div class="d-inline-flex gap-2">
+                                            <a href="{{ url_for('blog.edit_post', post_id=post.id) }}" 
+                                               class="btn btn-sm btn-outline-secondary rounded-pill px-3" 
+                                               title="Edit this post">
+                                                <i class="bi bi-pencil me-1"></i> Edit
+                                            </a>
+                                            <!-- Post Delete Form with Confirmation Dialog -->
+                                            <form method="POST" action="{{ url_for('blog.delete_post', post_id=post.id) }}" 
+                                                  class="d-inline form-delete-confirm" data-item-type="blog post">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3" title="Delete this post">
+                                                    <i class="bi bi-trash3 me-1"></i> Delete
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <!-- Empty State for User with No Posts -->
+                <div class="empty-state border-0 my-0 py-5">
+                    <div class="empty-state-icon text-muted">
+                        <i class="bi bi-journal-plus"></i>
+                    </div>
+                    <h4 class="fw-bold text-dark mb-2">No Blog Posts Yet</h4>
+                    <p class="text-secondary small mb-4" style="max-width: 460px; margin: 0 auto;">
+                        You haven't written any articles yet. Share your stories, coding tutorials, or industry insights with the FlaskBlog community!
+                    </p>
+                    <a href="{{ url_for('blog.create_post') }}" class="btn btn-primary px-4 py-2 rounded-pill fw-semibold">
+                        <i class="bi bi-pencil-square me-1"></i> Create Your First Post
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

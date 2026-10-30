@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="post-detail-container">
+        <!-- Post Header -->
+        <header class="post-header">
+            <!-- Category and Date -->
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <a href="{{ url_for('main.index', category=post.category.slug) }}" 
+                   class="badge bg-primary text-white text-decoration-none px-3 py-2 rounded-pill">
+                    {{ post.category.name }}
+                </a>
+                <span class="text-secondary small">
+                    <i class="bi bi-calendar3 me-1"></i> Published on {{ post.created_at.strftime('%B %d, %Y') }}
+                </span>
+            </div>
+
+            <!-- Complete Title -->
+            <h1 class="post-title">{{ post.title }}</h1>
+
+            <!-- Author & Metadata -->
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 pt-2">
+                <div class="d-flex align-items-center gap-2">
+                    <a href="{{ url_for('auth.user_profile', username=post.author.username) }}" class="author-badge">
+                        <span class="avatar-circle fs-6">{{ post.author.username[:1].upper() }}</span>
+                        <div>
+                            <div class="fw-bold text-dark">{{ post.author.username }}</div>
+                            <div class="text-secondary small">Author</div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Post Owner Actions: Edit and Delete Buttons -->
+                {% if current_user.is_authenticated and current_user.id == post.user_id %}
+                    <div class="d-flex align-items-center gap-2">
+                        <a href="{{ url_for('blog.edit_post', post_id=post.id) }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                            <i class="bi bi-pencil me-1"></i> Edit Post
+                        </a>
+                        <!-- Form with delete confirmation -->
+                        <form method="POST" action="{{ url_for('blog.delete_post', post_id=post.id) }}" 
+                              class="d-inline form-delete-confirm" data-item-type="blog post">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+                                <i class="bi bi-trash3 me-1"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+        </header>
+
+        <!-- Full Post Content (Sanitized HTML & Markdown) -->
+        <article class="post-content">
+            {{ post.html_content }}
+        </article>
+
+        <!-- Post Footer / Navigation Back -->
+        <div class="d-flex justify-content-between align-items-center py-4 border-top border-bottom mb-5">
+            <a href="{{ url_for('main.index') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                <i class="bi bi-arrow-left me-1"></i> Back to All Articles
+            </a>
+            <div class="d-flex align-items-center gap-2 text-secondary small">
+                <span>Share:</span>
+                <a href="https://twitter.com/intent/tweet?text={{ post.title|urlencode }}&url={{ request.url|urlencode }}" 
+                   target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-light border rounded-circle text-primary" title="Share on Twitter">
+                    <i class="bi bi-twitter-x"></i>
+                </a>
+                <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.url|urlencode }}" 
+                   target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-light border rounded-circle text-primary" title="Share on LinkedIn">
+                    <i class="bi bi-linkedin"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- COMMENTS SECTION -->
+        <section id="comments-section" class="comments-section">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h3 class="fw-bold text-dark mb-0">
+                    <i class="bi bi-chat-left-text text-primary me-2"></i>Comments 
+                    <span class="badge bg-light text-secondary border fs-6 ms-2">{{ comments|length }}</span>
+                </h3>
+            </div>
+
+            <!-- Comment Input Box -->
+            <div class="card border-1 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    {% if current_user.is_authenticated %}
+                        <h5 class="fw-bold text-dark mb-3">Leave a Comment</h5>
+                        <form method="POST" action="{{ url_for('blog.post_detail', post_id=post.id) }}">
+                            {{ comment_form.hidden_tag() }}
+                            <div class="mb-3">
+                                {{ comment_form.content(class="form-control" ~ (" is-invalid" if comment_form.content.errors else ""), 
+                                                        rows="3", 
+                                                        placeholder="Write your thoughtful comment here...") }}
+                                {% for error in comment_form.content.errors %}
+                                    <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="d-flex justify-content-end">
+                                {{ comment_form.submit(class="btn btn-primary px-4 rounded-pill fw-semibold") }}
+                            </div>
+                        </form>
+                    {% else %}
+                        <!-- Unauthenticated Visitors Prompt -->
+                        <div class="text-center py-3">
+                            <i class="bi bi-chat-square-quote text-secondary fs-2 mb-2"></i>
+                            <h5 class="fw-bold text-dark mb-2">Join the Conversation</h5>
+                            <p class="text-secondary small mb-3">
+                                Sign in or create a free account to share your thoughts, ask questions, or connect with the author.
+                            </p>
+                            <div class="d-flex justify-content-center gap-2">
+                                <a href="{{ url_for('auth.login', next=request.path) }}" class="btn btn-primary btn-sm px-4 rounded-pill">
+                                    <i class="bi bi-box-arrow-in-right me-1"></i> Sign In to Comment
+                                </a>
+                                <a href="{{ url_for('auth.register') }}" class="btn btn-outline-secondary btn-sm px-4 rounded-pill">
+                                    Register
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Comments List -->
+            {% if comments %}
+                <div class="comments-list">
+                    {% for c in comments %}
+                        <div class="comment-card" id="comment-{{ c.id }}">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div class="comment-author-info">
+                                    <span class="avatar-circle" style="width: 28px; height: 28px; font-size: 0.8rem;">
+                                        {{ c.author.username[:1].upper() }}
+                                    </span>
+                                    <div>
+                                        <a href="{{ url_for('auth.user_profile', username=c.author.username) }}" class="fw-bold text-dark text-decoration-none small">
+                                            {{ c.author.username }}
+                                        </a>
+                                        <span class="text-secondary small ms-2">
+                                            &bull; {{ c.created_at.strftime('%b %d, %Y at %I:%M %p') }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Comment Owner Actions: Edit and Delete Buttons -->
+                                {% if current_user.is_authenticated and current_user.id == c.user_id %}
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-link text-secondary p-0 border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="bi bi-three-dots-vertical"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 small">
+                                            <li>
+                                                <a class="dropdown-item py-1" href="{{ url_for('blog.edit_comment', comment_id=c.id) }}">
+                                                    <i class="bi bi-pencil me-2 text-primary"></i> Edit
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <form method="POST" action="{{ url_for('blog.delete_comment', comment_id=c.id) }}" 
+                                                      class="form-delete-confirm" data-item-type="comment">
+                                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                    <button type="submit" class="dropdown-item py-1 text-danger">
+                                                        <i class="bi bi-trash3 me-2"></i> Delete
+                                                    </button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Comment Content -->
+                            <div class="comment-content">
+                                {{ c.content }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-4 bg-white border rounded-3 p-4">
+                    <p class="text-secondary mb-0">
+                        <i class="bi bi-chat-dots me-1"></i> No comments yet. Be the first to share your thoughts!
+                    </p>
+                </div>
+            {% endif %}
+        </section>
+    </div>
+</div>
+{% endblock %}

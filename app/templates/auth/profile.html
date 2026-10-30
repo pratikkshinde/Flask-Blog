@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-2">
+    <div class="row g-4">
+        <!-- User Info Sidebar Card -->
+        <div class="col-lg-4">
+            <div class="card border-1 shadow-sm rounded-3">
+                <div class="card-body p-4 text-center">
+                    <div class="avatar-circle mx-auto mb-3" style="width: 72px; height: 72px; font-size: 2rem;">
+                        {{ user.username[:1].upper() }}
+                    </div>
+                    <h3 class="fw-bold text-dark mb-1">{{ user.username }}</h3>
+                    <p class="text-secondary small mb-3">
+                        <i class="bi bi-envelope me-1"></i>{{ user.email }}
+                    </p>
+
+                    <hr class="my-3">
+
+                    <div class="d-flex justify-content-around text-center py-2">
+                        <div>
+                            <div class="fw-bold text-dark fs-5">{{ total_posts }}</div>
+                            <div class="text-secondary small">Published Articles</div>
+                        </div>
+                        <div>
+                            <div class="fw-bold text-dark fs-5">{{ user.comments.count() }}</div>
+                            <div class="text-secondary small">Comments</div>
+                        </div>
+                    </div>
+
+                    <hr class="my-3">
+
+                    <div class="text-secondary small text-start">
+                        <p class="mb-2">
+                            <i class="bi bi-calendar-check me-2 text-primary"></i>
+                            <strong>Member Since:</strong> {{ user.created_at.strftime('%B %d, %Y') }}
+                        </p>
+                        <p class="mb-0">
+                            <i class="bi bi-shield-check me-2 text-success"></i>
+                            <strong>Account Status:</strong> Active Contributor
+                        </p>
+                    </div>
+
+                    {% if current_user.is_authenticated and current_user.id == user.id %}
+                        <div class="mt-4 pt-2">
+                            <a href="{{ url_for('auth.dashboard') }}" class="btn btn-outline-primary btn-sm w-100 rounded-pill">
+                                <i class="bi bi-speedometer2 me-1"></i> Go to Dashboard
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- User's Published Posts -->
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="fw-bold text-dark mb-0">
+                    <i class="bi bi-collection me-2 text-primary"></i>Published Stories by {{ user.username }}
+                </h4>
+                <span class="badge bg-light text-secondary border px-3 py-2">
+                    {{ total_posts }} {{ 'post' if total_posts == 1 else 'posts' }}
+                </span>
+            </div>
+
+            {% if posts %}
+                <div class="d-flex flex-column gap-3">
+                    {% for post in posts %}
+                        <article class="card border-1 shadow-sm rounded-3">
+                            <div class="card-body p-4">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="badge bg-light text-primary border">{{ post.category.name }}</span>
+                                    <span class="text-secondary small">
+                                        <i class="bi bi-calendar3 me-1"></i>{{ post.created_at.strftime('%b %d, %Y') }}
+                                    </span>
+                                </div>
+                                <h4 class="blog-card-title mb-2">
+                                    <a href="{{ url_for('blog.post_detail', post_id=post.id) }}">{{ post.title }}</a>
+                                </h4>
+                                <p class="text-secondary small mb-3">
+                                    {{ post.summary(180) }}
+                                </p>
+                                <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                                    <span class="text-secondary small">
+                                        <i class="bi bi-chat-dots me-1"></i>{{ post.comment_count }} comments
+                                    </span>
+                                    <a href="{{ url_for('blog.post_detail', post_id=post.id) }}" class="fw-semibold text-primary text-decoration-none small">
+                                        Read Story <i class="bi bi-arrow-right ms-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon text-muted">
+                        <i class="bi bi-journal-text"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-2">No Articles Published Yet</h5>
+                    <p class="text-secondary small mb-0">
+                        {{ user.username }} has not published any blog posts on the platform yet.
+                    </p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

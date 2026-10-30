@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-2">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="card border-1 shadow-sm rounded-3">
+                <div class="card-body p-4 p-md-5">
+                    <div class="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom">
+                        <div>
+                            <h2 class="fw-bold text-dark mb-1">Create New Blog Post</h2>
+                            <p class="text-secondary small mb-0">Share your thoughts, tutorials, or industry insights.</p>
+                        </div>
+                        <a href="{{ url_for('auth.dashboard') }}" class="btn btn-outline-secondary btn-sm rounded-pill">
+                            <i class="bi bi-x-lg me-1"></i> Cancel
+                        </a>
+                    </div>
+
+                    <form method="POST" action="{{ url_for('blog.create_post') }}">
+                        {{ form.hidden_tag() }}
+
+                        <!-- Post Title -->
+                        <div class="mb-3">
+                            {{ form.title.label(class="form-label fw-semibold text-dark") }}
+                            {{ form.title(class="form-control form-control-lg" ~ (" is-invalid" if form.title.errors else ""), 
+                                          placeholder="Enter an engaging, descriptive title...") }}
+                            {% for error in form.title.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Category Selection -->
+                        <div class="mb-4">
+                            {{ form.category_id.label(class="form-label fw-semibold text-dark") }}
+                            {{ form.category_id(class="form-select" ~ (" is-invalid" if form.category_id.errors else "")) }}
+                            {% for error in form.category_id.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Content Editor with Rich Text Toolbar & Live Preview -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="form-label fw-semibold text-dark mb-0">Post Content</label>
+                                <!-- Write / Preview Nav Tabs -->
+                                <ul class="nav nav-pills nav-fill small">
+                                    <li class="nav-item">
+                                        <button type="button" class="nav-link py-1 px-3 active fw-semibold" id="write-tab-btn">
+                                            <i class="bi bi-pen me-1"></i> Write
+                                        </button>
+                                    </li>
+                                    <li class="nav-item">
+                                        <button type="button" class="nav-link py-1 px-3 fw-semibold" id="preview-tab-btn">
+                                            <i class="bi bi-eye me-1"></i> Live Preview
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- Write Mode Container -->
+                            <div id="editor-write-container">
+                                <!-- Formatting Toolbar -->
+                                <div class="editor-toolbar">
+                                    <button type="button" class="editor-btn fw-bold" data-format="bold" title="Bold (**text**)">B</button>
+                                    <button type="button" class="editor-btn fst-italic" data-format="italic" title="Italic (*text*)">I</button>
+                                    <button type="button" class="editor-btn" data-format="heading" title="Heading (## Heading)">H2</button>
+                                    <button type="button" class="editor-btn" data-format="quote" title="Quote (> Quote)"><i class="bi bi-quote"></i></button>
+                                    <button type="button" class="editor-btn" data-format="code" title="Code (`code`)"><i class="bi bi-code-slash"></i></button>
+                                    <button type="button" class="editor-btn" data-format="list" title="Bullet List (- Item)"><i class="bi bi-list-ul"></i></button>
+                                    <button type="button" class="editor-btn" data-format="link" title="Link ([text](url))"><i class="bi bi-link-45deg"></i></button>
+                                </div>
+                                {{ form.content(class="form-control editor-textarea" ~ (" is-invalid" if form.content.errors else ""), 
+                                                id="post-content-editor", 
+                                                rows="14", 
+                                                placeholder="Write your story using Markdown syntax or use the toolbar above...") }}
+                            </div>
+
+                            <!-- Live Preview Container (Hidden by default) -->
+                            <div id="editor-preview-container" class="card card-body p-4 border bg-white rounded-bottom d-none" 
+                                 style="min-height: 380px;">
+                                <!-- Live rendered output will be populated by main.js -->
+                            </div>
+
+                            {% for error in form.content.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                            <div class="form-text small text-muted mt-2">
+                                <i class="bi bi-info-circle me-1"></i> Markdown formatting supported (headers, code blocks, lists, quotes, links). Unsafe HTML will be sanitized.
+                            </div>
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div class="d-flex justify-content-end gap-2 pt-2 border-top">
+                            <a href="{{ url_for('auth.dashboard') }}" class="btn btn-outline-secondary px-4 rounded-pill">
+                                Cancel
+                            </a>
+                            {{ form.submit(class="btn btn-primary px-4 rounded-pill fw-semibold") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5 text-center">
+    <div class="empty-state py-5 my-0">
+        <div class="display-1 fw-bold text-primary mb-3">404</div>
+        <h2 class="fw-bold text-dark mb-2">Page Not Found</h2>
+        <p class="text-secondary mx-auto mb-4" style="max-width: 500px;">
+            The page, article, or resource you are looking for doesn't exist or may have been moved or deleted.
+        </p>
+        <div class="d-flex justify-content-center gap-2">
+            <a href="{{ url_for('main.index') }}" class="btn btn-primary px-4 rounded-pill">
+                <i class="bi bi-house-door me-1"></i> Return Home
+            </a>
+            <a href="{{ url_for('main.explore') }}" class="btn btn-outline-secondary px-4 rounded-pill">
+                <i class="bi bi-compass me-1"></i> Explore Categories
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

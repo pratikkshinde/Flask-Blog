@@ -1,0 +1,35 @@
+# Python Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+
+# Byte-compiled / optimized files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment Variables & Secrets
+.env
+.env.local
+
+# SQLite Database & Instance directory
+instance/
+*.db
+*.sqlite3
+
+# Pytest / Test Artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# IDE / Editor Files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS Generated
+.DS_Store
+Thumbs.db
