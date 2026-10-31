@@ -4,7 +4,7 @@
 
 A modern, production-grade blogging platform developed using Python, Flask, SQLAlchemy, Flask-Login, Flask-Migrate, and Bootstrap 5 with custom brand identity.
 
-🌐 **Live Application:** [https://blogify-by-ps.onrender.com/](https://blogify-by-ps.onrender.com/)
+🌐 **Live Application:** [https://blogify-ps.vercel.app/](https://blogify-ps.vercel.app/)
 
 ---
 
