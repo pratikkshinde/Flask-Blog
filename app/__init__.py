@@ -65,6 +65,18 @@ def create_app(config_name=None):
 
     app.wsgi_app = VercelPathFixMiddleware(app.wsgi_app)
 
+    # Redirect Render traffic automatically to Vercel
+    @app.before_request
+    def redirect_render_to_vercel():
+        from flask import request, redirect
+        host = request.host.lower()
+        if 'onrender.com' in host:
+            qs = request.query_string.decode('utf-8') if request.query_string else ''
+            target = f"https://blogify-ps.vercel.app{request.path}"
+            if qs:
+                target = f"{target}?{qs}"
+            return redirect(target, code=301)
+
     # Context processors for global template access
     from app.models import Category
     from app.forms import SearchForm
