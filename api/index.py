@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+from urllib.parse import parse_qs, urlencode
 
 # Add project root directory to sys.path so app and config can be imported
 ROOT_DIR = Path(__file__).resolve().parent.parent
@@ -11,32 +12,27 @@ from wsgi import app
 
 class VercelPathFixMiddleware:
     """
-    WSGI Middleware to fix PATH_INFO on Vercel Serverless.
-    When Vercel rewrites incoming traffic to /api/index, PATH_INFO
-    is often set to '/api/index' instead of the user's actual URL.
-    This middleware restores the original URL from Vercel's proxy headers
-    so Flask routes ('/', '/explore', etc.) match accurately.
+    WSGI Middleware to restore original request paths on Vercel Serverless.
+    Vercel rewrites routes to /api/index?__vercel_path=/<path>.
+    This middleware extracts the captured path, sets PATH_INFO, and cleans
+    up QUERY_STRING so Flask route matching and URL generation work seamlessly.
     """
     def __init__(self, wsgi_app):
         self.wsgi_app = wsgi_app
 
     def __call__(self, environ, start_response):
-        # 1. Check Vercel proxy headers for the true browser path
-        real_path = None
-        for header in (
-            'HTTP_X_MATCHED_PATH',
-            'HTTP_X_FORWARDED_URI',
-            'HTTP_X_ORIGINAL_URI',
-        ):
-            val = environ.get(header)
-            if val and not val.startswith('/api/index'):
-                real_path = val.split('?')[0]
-                break
-
-        if real_path:
-            environ['PATH_INFO'] = real_path
+        qs = environ.get('QUERY_STRING', '')
+        if '__vercel_path=' in qs:
+            params = parse_qs(qs, keep_blank_values=True)
+            vpath = params.pop('__vercel_path', ['/'])[0]
+            # Normalize path
+            if not vpath or vpath == '//':
+                vpath = '/'
+            elif vpath.startswith('//'):
+                vpath = '/' + vpath.lstrip('/')
+            environ['PATH_INFO'] = vpath
+            environ['QUERY_STRING'] = urlencode(params, doseq=True)
         else:
-            # 2. Fallback prefix stripping
             path_info = environ.get('PATH_INFO', '')
             if path_info in ('/api/index', '/api', '/api/'):
                 environ['PATH_INFO'] = '/'
@@ -49,5 +45,5 @@ class VercelPathFixMiddleware:
         return self.wsgi_app(environ, start_response)
 
 
-# Wrap Flask's WSGI app with the path fix middleware
+# Wrap Flask's WSGI application with the Vercel path fix middleware
 app.wsgi_app = VercelPathFixMiddleware(app.wsgi_app)

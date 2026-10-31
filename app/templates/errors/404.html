@@ -7,8 +7,6 @@
         <h2 class="fw-bold text-dark mb-2">Page Not Found</h2>
         <p class="text-secondary mx-auto mb-4" style="max-width: 500px;">
             The page, article, or resource you are looking for doesn't exist or may have been moved or deleted.
-            <!-- DEBUG_PATH: {{ request.path }} | {{ request.environ.get('PATH_INFO') }} -->
-            <!-- DEBUG_HEADERS: {{ request.headers }} -->
         </p>
         <div class="d-flex justify-content-center gap-2">
             <a href="{{ url_for('main.index') }}" class="btn btn-primary px-4 rounded-pill">
@@ -21,4 +19,3 @@
     </div>
 </div>
 {% endblock %}
-
