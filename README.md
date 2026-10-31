@@ -1,4 +1,4 @@
-# Blogify — Modern Publishing Platform (Phase 2 Complete)
+# Blogify — Modern Publishing Platform
 
 > **Write. Share. Inspire.**
 
