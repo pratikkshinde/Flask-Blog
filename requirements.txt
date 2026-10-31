@@ -10,6 +10,7 @@ email-validator>=2.2.0
 # Database & ORM
 SQLAlchemy>=2.0.0
 alembic>=1.13.0
+psycopg2-binary>=2.9.9
 
 # Content Rendering & Sanitization
 bleach>=6.1.0
