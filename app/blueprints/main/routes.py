@@ -6,6 +6,8 @@ from app.forms import SearchForm
 
 
 @main_bp.route('/')
+@main_bp.route('/api/index')
+@main_bp.route('/api')
 def index():
     """
     Homepage displaying published blog posts with search, category filtering,
@@ -71,6 +73,8 @@ def index():
 
 
 @main_bp.route('/explore')
+@main_bp.route('/api/index/explore')
+@main_bp.route('/api/explore')
 def explore():
     """Explore all topics, featured categories, and trending discussions."""
     try:
