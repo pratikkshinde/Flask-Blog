@@ -9,7 +9,7 @@ from app.models import User, Category, Post, Comment
 
 
 def seed_database():
-    app = create_app('development')
+    app = create_app(os.environ.get('FLASK_ENV', 'production'))
     with app.app_context():
         print("Ensuring tables are created...")
         db.create_all()
